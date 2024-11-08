@@ -4,133 +4,168 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Student Enrollment and Grade Processing System</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <style>
-        /* Remove outer borders and margins */
-        .no-border {
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        form, .student-details {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .student-details h2, form h2 {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"], input[type="email"], input[type="number"], select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        input[type="radio"] {
+            margin-right: 5px;
+        }
+        .submit-btn {
+            padding: 10px 20px;
+            color: white;
+            background-color: #007bff;
             border: none;
-            padding: 0;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <body>
 
-<div class="container mt-5">
-    <h2 class="text-center">Student Enrollment and Grade Processing System</h2>
+<h1>Student Enrollment and Grade Processing System</h1>
+
+<?php
+// Initialize variables
+$studentInfoSubmitted = false;
+$gradesSubmitted = false;
+$firstName = $lastName = $age = $gender = $course = $email = "";
+$prelim = $midterm = $final = $averageGrade = 0;
+$gradeStatus = "";
+
+// Check if the student info form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submitStudentInfo'])) {
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $age = $_POST['age'];
+    $gender = $_POST['gender'];
+    $course = $_POST['course'];
+    $email = $_POST['email'];
+    $studentInfoSubmitted = true;
+}
+
+// Check if the grades form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['submitGrades'])) {
+    $firstName = $_POST['firstName'];
+    $lastName = $_POST['lastName'];
+    $age = $_POST['age'];
+    $gender = $_POST['gender'];
+    $course = $_POST['course'];
+    $email = $_POST['email'];
     
-    <!-- Student Enrollment Form -->
-    <form method="post" class="p-4 mt-4 no-border">
-        <h3>Student Enrollment Form</h3>
-        <div class="form-group">
-            <label for="firstName">First Name</label>
-            <input type="text" name="firstName" id="firstName" class="form-control" required>
-        </div>
+    $prelim = $_POST['prelim'];
+    $midterm = $_POST['midterm'];
+    $final = $_POST['final'];
+    $averageGrade = ($prelim + $midterm + $final) / 3;
+    $gradeStatus = $averageGrade >= 75 ? "Passed" : "Failed";
+    $gradesSubmitted = true;
+}
+?>
 
-        <div class="form-group">
-            <label for="lastName">Last Name</label>
-            <input type="text" name="lastName" id="lastName" class="form-control" required>
-        </div>
+<!-- Student Enrollment Form -->
+<?php if (!$studentInfoSubmitted): ?>
+    <form method="post">
+        <h2>Student Enrollment Form</h2>
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" name="firstName" required>
 
-        <div class="form-group">
-            <label for="age">Age</label>
-            <input type="number" name="age" id="age" class="form-control" required>
-        </div><br>
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" name="lastName" required>
 
-        <div class="form-group">
-            <label>Gender</label><br>
-            <div class="form-check form-check-inline">
-                <input type="radio" name="gender" id="male" value="Male" class="form-check-input" checked>
-                <label for="male" class="form-check-label">Male</label>
-            </div>
-            <div class="form-check form-check-inline">
-                <input type="radio" name="gender" id="female" value="Female" class="form-check-input">
-                <label for="female" class="form-check-label">Female</label>
-            </div>
-        </div><br>
+        <label for="age">Age</label>
+        <input type="number" id="age" name="age" required>
 
-        <div class="form-group">
-            <label for="course">Course</label>
-            <select name="course" id="course" class="form-control" required>
-                <option value="BSIT" disabled selected>BSIT</option>
-                <option value="BSBA">BSBA</option>
-                <option value="BSHRM">BSHRM</option>
-            </select>
-        </div><br>
+        <label>Gender</label>
+        <input type="radio" id="male" name="gender" value="Male" checked>
+        <label for="male">Male</label>
+        <label for="female">Female</label>
+        <input type="radio" id="female" name="gender" value="Female">
 
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" class="form-control" required>
-        </div>
+        <label for="course">Course</label>
+        <select id="course" name="course" required>
+            <option value="BSIT">BSIT</option>
+            <option value="BSCS">BSCS</option>
+        </select>
 
-        <!-- Separate Grade Section -->
-        <fieldset class="p-3 mt-4 no-border">
-            <legend class="w-auto px-3">Enter Grades</legend>
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
 
-            <div class="form-group">
-                <label for="prelim">Prelim</label>
-                <input type="number" name="prelim" id="prelim" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="midterm">Midterm</label>
-                <input type="number" name="midterm" id="midterm" class="form-control" required>
-            </div>
-
-            <div class="form-group">
-                <label for="final">Final</label>
-                <input type="number" name="final" id="final" class="form-control" required>
-            </div>
-        </fieldset>
-
-        <button type="submit" class="btn btn-primary btn-block mt-4">Submit Student Information</button>
+        <button type="submit" name="submitStudentInfo" class="submit-btn">Submit Student Information</button>
     </form>
+<?php endif; ?>
 
-    <!-- Display Student Details and Grades -->
-    <?php if ($_SERVER['REQUEST_METHOD'] == 'POST'): ?>
-        <?php
-            // Capture form data
-            $firstName = htmlspecialchars($_POST['firstName']);
-            $lastName = htmlspecialchars($_POST['lastName']);
-            $age = htmlspecialchars($_POST['age']);
-            $gender = htmlspecialchars($_POST['gender']);
-            $email = htmlspecialchars($_POST['email']);
-            $prelim = floatval($_POST['prelim']);
-            $midterm = floatval($_POST['midterm']);
-            $final = floatval($_POST['final']);
+<!-- Grades Form -->
+<?php if ($studentInfoSubmitted && !$gradesSubmitted): ?>
+    <form method="post">
+        <h2>Enter Grades for <?php echo htmlspecialchars($firstName . " " . $lastName); ?></h2>
+        
+        <!-- Hidden fields to pass student info -->
+        <input type="hidden" name="firstName" value="<?php echo htmlspecialchars($firstName); ?>">
+        <input type="hidden" name="lastName" value="<?php echo htmlspecialchars($lastName); ?>">
+        <input type="hidden" name="age" value="<?php echo htmlspecialchars($age); ?>">
+        <input type="hidden" name="gender" value="<?php echo htmlspecialchars($gender); ?>">
+        <input type="hidden" name="course" value="<?php echo htmlspecialchars($course); ?>">
+        <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
+        
+        <label for="prelim">Prelim</label>
+        <input type="number" id="prelim" name="prelim" required>
 
-            // Calculate average grade
-            $average = ($prelim + $midterm + $final) / 3;
-            $status = $average >= 75 ? "Passed" : "Failed";
+        <label for="midterm">Midterm</label>
+        <input type="number" id="midterm" name="midterm" required>
 
-            // Set Bootstrap class based on status
-            $statusClass = $status == "Passed" ? "text-success" : "text-danger";
-        ?>
+        <label for="final">Final</label>
+        <input type="number" id="final" name="final" required>
 
-        <div class="card mt-4 no-border">
-            <div class="card-body">
-                <h4 class="card-title">Student Details</h4>
-                <p><strong>First Name:</strong> <?php echo $firstName; ?></p>
-                <p><strong>Last Name:</strong> <?php echo $lastName; ?></p>
-                <p><strong>Age:</strong> <?php echo $age; ?></p>
-                <p><strong>Gender:</strong> <?php echo $gender; ?></p>
-                <p><strong>Email:</strong> <?php echo $email; ?></p>
+        <button type="submit" name="submitGrades" class="submit-btn" style="background-color: #28a745;">Submit Grades</button>
+    </form>
+<?php endif; ?>
 
-                <h4>Grades</h4>
-                <p><strong>Prelim:</strong> <?php echo $prelim; ?></p>
-                <p><strong>Midterm:</strong> <?php echo $midterm; ?></p>
-                <p><strong>Final:</strong> <?php echo $final; ?></p>
-                <p><strong>Average Grade:</strong> <?php echo number_format($average, 2); ?></p>
-                <p><strong>Status:</strong> <span class="<?php echo $statusClass; ?>"><?php echo $status; ?></span></p>
-            </div>
-        </div>
-    <?php endif; ?>
+<!-- Display Student Details and Grades -->
+<?php if ($gradesSubmitted): ?>
+    <div class="student-details">
+        <h2>Student Details</h2>
+        <p><strong>First Name:</strong> <?php echo htmlspecialchars($firstName); ?></p>
+        <p><strong>Last Name:</strong> <?php echo htmlspecialchars($lastName); ?></p>
+        <p><strong>Age:</strong> <?php echo htmlspecialchars($age); ?></p>
+        <p><strong>Gender:</strong> <?php echo htmlspecialchars($gender); ?></p>
+        <p><strong>Course:</strong> <?php echo htmlspecialchars($course); ?></p>
+        <p><strong>Email:</strong> <?php echo htmlspecialchars($email); ?></p>
 
-</div>
-
-<!-- Bootstrap JS and dependencies -->
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
-</html>
+        <h2>Grades</h2>
+        <p><strong>Prelim:</strong> <?php echo htmlspecialchars($prelim); ?></p>
+        <p><strong>Midterm:</strong> <?php echo htmlspecialchars($midterm); ?></p>
+        <p><strong>Final:</strong> <?php echo htmlspecialchars($final); ?></p>
+        <p><strong>Average Grade:</strong> 
+            <?php echo number_format($averageGrade, 2); ?> - 
+            <span class="<?php echo $gradeStatus == 'Passed' ? 'text-success' : 'text-danger'; ?>">
+                <?php echo $gradeStatus; ?>
+            </span>
+        </p>
+    </div>
+<?php endif; ?>
